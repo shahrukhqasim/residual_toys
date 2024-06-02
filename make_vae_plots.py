@@ -250,6 +250,6 @@ def sample_simple():
 
 if __name__ == '__main__':
 
-    main(sample_simple, '$x\sim\mathcal{N}(0,1)$', '$y\sim(x^2+\mathcal{N}(0,1))$', 'vae_y_eq_xsq_noise')
+    main(sample_simple, '$x\sim\mathcal{N}(0,1)$', '$y\sim(x^2+\mathcal{N}(0,0.3))$', 'vae_y_eq_xsq_noise')
     main(sample_x_y_eq_xq, '$x\sim\mathcal{N}(0,1)$', '$y\sim(x+\mathcal{N}(0,1))^2$', 'vae_y_eq_xsq')
     main(sample_gmm, '$x\sim\mathcal{U}(0,5)$', '$y \sim x + \mathcal{N}(-3, 1) + \mathcal{N}(3, 1)$','vae_y_eq_x_p_2dg')
