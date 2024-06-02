@@ -78,7 +78,7 @@ n_samples = 1000
 
 
 
-def main(sample_fn, filename):
+def main(sample_fn, t1, t2, filename):
 
     # Hyperparameters
     input_dim = 1
@@ -86,7 +86,7 @@ def main(sample_fn, filename):
     hidden_dim = 512
     latent_dim = 1
     learning_rate = 0.0001
-    num_epochs = 1000
+    num_epochs = 10000
     kld_weight = 0.0025
 
     # Prepare the data
@@ -140,25 +140,22 @@ def main(sample_fn, filename):
     ax1, ax2 = ax
 
 
-    # Plot the joint distribution of X and Y
-    plt.figure(figsize=(8, 6))
-
     X, Y = sample_fn()
     X = X.numpy().flatten()
     Y = Y.numpy().flatten()
     ax1.scatter(X, Y, alpha=0.5, s=0.1)
-    ax1.set_xlabel('X')
-    ax1.set_ylabel('Y')
-    ax1.set_title('Joint Distribution of X and Y')
+    ax1.set_xlabel(t1)
+    ax1.set_ylabel(t2)
+    ax1.set_title('Given data')
     # plt.show()
 
     # Plot the learned joint distribution of X and Y
     # plt.figure(figsize=(8, 6))
     # ax2.scatter(new_X, y_check, alpha=0.3, s=0.1,color='blue')
     ax2.scatter(new_X, generated_Y, alpha=0.5, s=0.1,color='red')
-    ax2.set_xlabel('X')
-    ax2.set_ylabel('Y')
-    ax2.set_title('Learned Joint Distribution of X and Y (Conditioned on X)')
+    ax2.set_xlabel(t1)
+    ax2.set_ylabel(t2)
+    ax2.set_title('VAE sampled')
 
     if not os.path.exists('out'):
         os.mkdir('out')
@@ -222,7 +219,7 @@ def main(sample_fn, filename):
 
 def sample_x_y_eq_xq():
     # Generate X ~ N(0,1)
-    X = np.random.normal(0, 10, n_samples)
+    X = np.random.normal(0, 1, n_samples)
     # Generate Y = (X + N(0,1))**2
     Y = (X + np.random.normal(0, 1, n_samples))**2
 
@@ -240,6 +237,19 @@ def sample_gmm():
     return torch.tensor(X, dtype=torch.float32).unsqueeze(1), torch.tensor(y, dtype=torch.float32).unsqueeze(1)
 
 
+def sample_simple():
+    # Generate X ~ N(0,1)
+    X = np.random.normal(0, 1, n_samples)
+    # Generate Y = (X + N(0,1))**2
+    Y = (X**2 + np.random.normal(0, 0.3, n_samples))
+
+    X_tensor = torch.tensor(X, dtype=torch.float32).unsqueeze(1)
+    Y_tensor = torch.tensor(Y, dtype=torch.float32).unsqueeze(1)
+
+    return X_tensor, Y_tensor
+
 if __name__ == '__main__':
-    main(sample_x_y_eq_xq, 'vae_y_eq_xsq')
-    main(sample_gmm, 'vae_y_eq_x_p_2dg')
+
+    main(sample_simple, '$x\sim\mathcal{N}(0,1)$', '$y\sim(x^2+\mathcal{N}(0,1))$', 'vae_y_eq_xsq_noise')
+    main(sample_x_y_eq_xq, '$x\sim\mathcal{N}(0,1)$', '$y\sim(x+\mathcal{N}(0,1))^2$', 'vae_y_eq_xsq')
+    main(sample_gmm, '$x\sim\mathcal{U}(0,5)$', '$y \sim x + \mathcal{N}(-3, 1) + \mathcal{N}(3, 1)$','vae_y_eq_x_p_2dg')
